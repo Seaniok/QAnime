@@ -1,0 +1,5 @@
+BASE_API = "https://hianime.at"
+SEARCH_API = f"{BASE_API}/search?keyword=%s"
+EPISODES_API = f"{BASE_API}/api/theme/episode/list/%s"
+SERVERS_API = f"{BASE_API}/api/theme/episode/servers?episodeId=%s"
+AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
