@@ -27,9 +27,11 @@ def hianime_search(anime: str):
                 break
             anime_title = anime_item.find("a")["title"]
             anime_link = anime_item.find("a")["href"]
+            anime_id = anime_link.split("-")[-1]
             anime_list.append({
                 "title": anime_title,
                 "link": anime_link,
+                "id": anime_id,
             })
         
     except requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError:
