@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.setupLayout()
     
     def setupUI(self):
-        self.resize(1920, 1080)
+        self.resize(1280, 720)
         self.setWindowTitle("QAnime")
         self.window_icon = QIcon(":/killua.jpg")
         self.setWindowIcon(self.window_icon)
@@ -32,9 +32,7 @@ class MainWindow(QMainWindow):
         
         self.search_button = QLineEdit(placeholderText="Search")
         self.layout.addWidget(self.search_button, alignment=Qt.AlignmentFlag.AlignHCenter)
-        self.search_button.setStyleSheet(
-            "padding"
-        )
+        """self.search_button.setStyleSheet"""
         
         
 
