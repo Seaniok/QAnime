@@ -12,6 +12,7 @@ def hianime_request():
     except requests.exceptions.ConnectTimeout:
         print(f"Connection Error or Connection Timeout")
         
+""" Searches the query nad gives a list of different series"""
 def hianime_search(anime: str):
     search_page = c.SEARCH_API % anime
     headers = {f"User-Agent": c.AGENT}
@@ -38,6 +39,11 @@ def hianime_search(anime: str):
         print("Connection Error or Connection Timeout")
     
     return anime_list
+
+"""Get the list of selected anime"""
+def hianime_episodes():
+    episodes_page = c.EPISODES_API % 
+    
 
 
     
