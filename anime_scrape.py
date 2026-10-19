@@ -4,18 +4,18 @@ import json
 from bs4 import BeautifulSoup
 
 def hianime_request():
-    headers = {f"User-Agent": c.AGENT}
+    headers = {"User-Agent": c.AGENT}
     
     try:
         r = requests.get(c.BASE_API, headers=headers)
         http_code = r.status_code
-    except requests.exceptions.ConnectTimeout:
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         print(f"Connection Error or Connection Timeout")
         
-""" Searches the query nad gives a list of different series"""
+""" Searches the query nad gives a list of different anime series"""
 def hianime_search(anime: str):
     search_page = c.SEARCH_API % anime
-    headers = {f"User-Agent": c.AGENT}
+    headers = {"User-Agent": c.AGENT}
     anime_list = []
     
     try:
@@ -35,14 +35,39 @@ def hianime_search(anime: str):
                 "id": anime_id,
             })
         
-    except requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError:
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         print("Connection Error or Connection Timeout")
     
     return anime_list
 
-"""Get the list of selected anime"""
-def hianime_episodes():
-    episodes_page = c.EPISODES_API % 
+"""Get the episodes list of the selected anime"""
+def hianime_episodes(anime_id):
+    episodes_page = c.EPISODES_API % anime_id
+    headers = {"User-Agent": c.AGENT}
+    episode_ids = []
+    
+    try:
+        r = requests.get(episodes_page, headers=headers)
+        data = r.json()
+        html_content = data.get("html", "")
+        content = BeautifulSoup(html_content, "html.parser")
+        for episode in content.find_all("a", class_="ep-item"):
+            ep_id = episode.get("data-id")
+            ep_number = episode.get("data-number")
+            
+            episode_ids.append({
+                "id": ep_id,
+                "number": ep_number
+            })
+            
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
+        print("Ups !")
+        
+    return episode_ids
+    
+    
+
+    
     
 
 
