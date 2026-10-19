@@ -39,7 +39,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(":/killua.jpg"))
     widget = MainWindow()
     widget.show()
     sys.exit(app.exec())
