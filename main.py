@@ -1,12 +1,13 @@
 # This Python file uses the following encoding: utf-8
 import sys
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QMenu, QMenuBar, QPushButton, QLineEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QMenu, QMenuBar, QPushButton, QLineEdit, QListWidget, QListWidgetItem
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 from PySide6.QtHelp import QHelpSearchQueryWidget
 import resources_rc
 import anime_scrape
+
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -34,19 +35,35 @@ class MainWindow(QMainWindow):
         
         self.search_button = QLineEdit(self, placeholderText="Search")
         self.layout.addWidget(self.search_button, alignment=Qt.AlignmentFlag.AlignCenter)
-        """self.search_button.setStyleSheet"""
-        
         self.search_button.returnPressed.connect(self.show_anime)
         
-        self.results_layout = QVBoxLayout()
-        self.layout.addLayout(self.results_layout)
+        self.anime_list = QListWidget()
+        self.layout.addWidget(self.anime_list, alignment=Qt.AlignmentFlag.AlignVertical_Mask)
+        self.anime_list.setStyleSheet(
+            "font-size: 15px;"
+        )
+        
+        self.episodes_list = QListWidget()
+        self.layout.addWidget(self.episodes_list)
+        self.anime_list.itemClicked.connect(self.on_anime_clicked)
     
     def show_anime(self):
-        result = anime_scrape.hianime_search(self.search_button.text())
-        for i in result:
-            anime_title = i["title"]
-            title_boxes = QPushButton(anime_title)
-            self.layout.addWidget(title_boxes)
+        self.anime_list.clear()
+        self.results = anime_scrape.hianime_search(self.search_button.text())
+        
+        for i in self.results:
+            self.anime_list.addItem(i["title"])
+            
+    def on_anime_clicked(self, item):
+        row = self.anime_list.row(item)
+        anime_id = self.results[row]["id"]
+        episodes = anime_scrape.hianime_episodes(anime_id)
+        
+        self.episodes_list.clear()
+        for episode in episodes:
+            ep_text = f"{episode["number"]}. {episode["title"]}"
+            self.episodes_list.addItem(ep_text)
+        
         
         
 
