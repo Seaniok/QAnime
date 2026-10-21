@@ -44,7 +44,7 @@ def hianime_search(anime: str):
 def hianime_episodes(anime_id):
     episodes_page = c.EPISODES_API % anime_id
     headers = {"User-Agent": c.AGENT}
-    episode_ids = []
+    episode_info = []
     
     try:
         r = requests.get(episodes_page, headers=headers)
@@ -54,16 +54,18 @@ def hianime_episodes(anime_id):
         for episode in content.find_all("a", class_="ep-item"):
             ep_id = episode.get("data-id")
             ep_number = episode.get("data-number")
+            ep_title = episode.get("title")
             
-            episode_ids.append({
+            episode_info.append({
                 "id": ep_id,
-                "number": ep_number
+                "number": ep_number,
+                "title": ep_title
             })
             
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         print("Ups !")
         
-    return episode_ids
+    return episode_info
     
     
 
