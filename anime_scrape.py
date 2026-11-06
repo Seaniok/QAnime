@@ -11,10 +11,9 @@ def hianime_request():
     headers = {"User-Agent": c.AGENT}
     
     try:
-        r = requests.get(c.BASE_API, headers=headers, timeout=10)
-        http_code = r.status_code
+        requests.get(c.BASE_API, headers=headers, timeout=10)
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        print(f"Connection Error or Connection Timeout")
+        print("Connection Error or Connection Timeout")
         
 """ Searches the query nad gives a list of different anime series"""
 def hianime_search(anime: str):
@@ -91,11 +90,11 @@ def hianime_download_m3u8(episode_id: int, desired_type: str):
 
                 decoded_hash = base64.b64decode(raw_hash).decode("utf-8")
             
-            server_info = {
-                "type": server_type,
-                "name": server_name,
-                "embed_url": decoded_hash
-            }
+                server_info = {
+                    "type": server_type,
+                    "name": server_name,
+                    "embed_url": decoded_hash
+                }
             break
         
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
@@ -130,7 +129,7 @@ def extract_video_data(server_info: dict):
     try:
         response = requests.get(embed_url, headers=headers, timeout=10)
         html_text = response.text
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException :
         print("Ups !")
         return server_info
     
