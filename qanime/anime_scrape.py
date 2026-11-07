@@ -1,5 +1,5 @@
 import requests
-import config as c
+from qanime import config as c
 import json
 from bs4 import BeautifulSoup
 import base64

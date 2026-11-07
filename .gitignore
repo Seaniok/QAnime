@@ -80,3 +80,9 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+
+# Python / editor
+env/
+.venv/
+__pycache__/
+.vscode/

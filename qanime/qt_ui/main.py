@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QListWidget, QLabel,
 )
 
-import anime_scrape
+from qanime import anime_scrape
 
 
 class MainWindow(QMainWindow):
@@ -69,7 +69,8 @@ class MainWindow(QMainWindow):
         ])
 
 
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-sys.exit(app.exec())
+def main():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
