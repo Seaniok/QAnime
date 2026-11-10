@@ -1,5 +1,2 @@
 [project]
 name = "QAnime"
-
-[tool.pyside6-project]
-files = ["main.py"]
