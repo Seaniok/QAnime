@@ -152,4 +152,4 @@ Scrapers depend on a site's exact markup and API. **If the site changes its doma
 
 ## License
 
-Released under the MIT License. See [LICENSE](LICENSE).
+Released under the GNU General Public License v3.0. See [LICENSE](LICENSE).
