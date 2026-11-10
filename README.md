@@ -13,7 +13,8 @@ It is a GUI take on the idea behind [ani-cli](https://github.com/pystardust/ani-
 - Search anime by name (top results shown)
 - List all episodes of the selected anime
 - Double-click an episode to play it in `mpv` (sub)
-- Plain Qt UI with three parts: search bar, anime list, episode list
+- Dark-themed Qt UI with a poster grid, a details panel (cover + synopsis), and an episode list
+- Network calls run in background threads, so the window stays responsive
 
 ---
 
@@ -27,7 +28,6 @@ It is a GUI take on the idea behind [ani-cli](https://github.com/pystardust/ani-
 | `requests` | HTTP requests |
 | `beautifulsoup4` | HTML parsing |
 
-> Note: `requirements.txt` currently lists only `PySide6`. Install `requests` and `beautifulsoup4` too (see below), or add them to the file.
 
 ### Installing mpv
 
