@@ -1,83 +1,73 @@
-# QAnime
+<h1 align="center">qanime</h1>
 
-A small desktop anime browser/player built with **Python + PySide6 (Qt)**. Search for a title, pick an episode, and QAnime hands the stream to **mpv** to play it.
+<p align="center">
+  Search for an anime, pick an episode, and watch it in <b>mpv</b>.<br>
+  A small desktop app built with Python and Qt, with no browser and no ads.
+</p>
 
-It is a GUI take on the idea behind [ani-cli](https://github.com/pystardust/ani-cli): search, pick, watch, with no browser and no ads.
+<p align="center">
+  <img alt="Python 3.9+" src="https://img.shields.io/badge/python-3.9%2B-3776ab?style=flat-square">
+  <img alt="PySide6" src="https://img.shields.io/badge/UI-PySide6-41cd52?style=flat-square">
+  <img alt="mpv" src="https://img.shields.io/badge/player-mpv-8e44ad?style=flat-square">
+</p>
 
-> ⚠️ **Read the [Legal / Disclaimer](#legal--disclaimer) section before using or sharing this project.**
+<p align="center">
+  <img src="docs/screenshots/landing.png" alt="QAnime landing page" width="760">
+</p>
+
+> This is a hobby project and hosts no video. Please read the [legal note](#legal--disclaimer) before using or sharing it.
 
 ---
+
+## Screenshots
+
+| Results | Episodes |
+|---|---|
+| ![Search results](docs/screenshots/results.png) | ![Episode list](docs/screenshots/episodes.png) |
 
 ## Features
 
-- Search anime by name (top results shown)
-- List all episodes of the selected anime
+- Search by title and browse results as a poster grid
+- See the cover and synopsis, then the full episode list
 - Double-click an episode to play it in `mpv` (sub)
-- Dark-themed Qt UI with a poster grid, a details panel (cover + synopsis), and an episode list
-- Network calls run in background threads, so the window stays responsive
+- Dark UI; network calls run in background threads, so the window never freezes
+
+Inspired by [ani-cli](https://github.com/pystardust/ani-cli).
 
 ---
 
-## Requirements
+## Quick start
 
-| Requirement | Notes |
-|---|---|
-| Python 3.9+ | Any recent 3.x should work |
-| [mpv](https://mpv.io/) | Must be installed and available on your `PATH` |
-| `PySide6` | GUI toolkit |
-| `requests` | HTTP requests |
-| `beautifulsoup4` | HTML parsing |
-
-
-### Installing mpv
-
-- **Windows:** `winget install mpv` or `scoop install mpv`, or download from <https://mpv.io/installation/> and add it to `PATH`
-- **macOS:** `brew install mpv`
-- **Linux:** `sudo apt install mpv` / `sudo dnf install mpv` / `sudo pacman -S mpv`
-
-Check it works with `mpv --version`.
-
----
-
-## Installation and launch
+You need Python 3.9+ and [mpv](https://mpv.io/) on your `PATH`.
 
 ```bash
-# 1. Clone
 git clone https://github.com/Seaniok/QAnime.git
 cd QAnime
 
-# 2. (Recommended) create a virtual environment
 python -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
+source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
 
-# 3. Install dependencies
 pip install -r requirements.txt
-pip install requests beautifulsoup4
-
-# 4. Run
-python main.py
+python -m qanime
 ```
+
+Install mpv with `brew install mpv` (macOS), `winget install mpv` (Windows) or `sudo apt install mpv` (Linux). Check it with `mpv --version`.
 
 ### Using it
 
-1. Type an anime title in the search bar and press **Enter**.
-2. Click an anime in the **Anime** list to load its episodes.
-3. **Double-click** an episode in the **Episodes** list.
-4. mpv opens and plays the stream. If nothing is found, the status bar shows `No stream found` or `No m3u8 link`.
+1. Type an anime title on the start page and press **Enter**.
+2. Click an anime in the results.
+3. **Double-click** an episode, or select one and press **Play episode**.
+4. mpv opens and plays the stream. If nothing is found, the status bar says `No stream found` or `No m3u8 link`.
 
 ---
 
 ## How it works
 
-QAnime has two parts: the UI (`main.py`) and the scraper (`anime_scrape.py`).
-
 ```
 ┌──────────┐  search   ┌────────────────┐  HTML/JSON   ┌───────────────┐
-│ main.py  │ ────────► │ anime_scrape.py│ ───────────► │ streaming site│
-│ (PySide6)│ ◄──────── │(requests + bs4)│ ◄─────────── │(see config.py)│
+│  Qt UI   │ ────────► │ anime_scrape.py│ ───────────► │ streaming site│
+│(PySide6) │ ◄──────── │(requests + bs4)│ ◄─────────── │(see config.py)│
 └────┬─────┘  results  └────────────────┘              └───────────────┘
      │ m3u8 URL + Referer
      ▼
@@ -86,41 +76,44 @@ QAnime has two parts: the UI (`main.py`) and the scraper (`anime_scrape.py`).
    └─────┘
 ```
 
-### The flow, step by step
+1. **Search**: `hianime_search()` requests the site's search page and parses the results with BeautifulSoup into title, link and numeric ID (at most 9 results).
+2. **Episodes**: `hianime_episodes()` calls the episode-list endpoint for that ID. The JSON holds an HTML fragment, parsed into `{id, number, title}`.
+3. **Servers**: `hianime_download_m3u8()` lists the video servers for the episode, picks `sub` or `dub` (the UI uses `sub`), and base64-decodes the `data-hash` into an embed-page URL.
+4. **Stream extraction**: `extract_video_data()` loads the embed page with a matching `Referer`, base64-decodes the obfuscated `window.__P` blob and XOR-decrypts it with a fixed key. The result contains the direct `.m3u8` (HLS) URL.
+5. **Playback**: the UI starts `mpv` with the m3u8 URL and a `--http-header-fields=Referer: ...` argument, because the video host rejects requests without it.
 
-1. **Search**: `hianime_search()` requests the site's search page and parses the results with BeautifulSoup. For each result it pulls out the title, link, and numeric ID (the last `-`-separated part of the link). It returns at most 9 results.
-2. **Episodes**: `hianime_episodes()` calls the site's episode-list endpoint for the chosen anime ID. The response is JSON with an HTML fragment, which is parsed into `{id, number, title}` per episode.
-3. **Servers**: `hianime_download_m3u8()` asks for the list of video servers for that episode, picks the matching server for the requested type (`sub` or `dub`; the UI currently uses `sub`), and base64-decodes its `data-hash` into an embed-page URL.
-4. **Stream extraction**: `extract_video_data()` loads the embed page (with a matching `Referer` header), finds the obfuscated `window.__P` blob, base64-decodes it, and XOR-decrypts it with a fixed key. The decrypted JSON contains the direct `.m3u8` (HLS) stream URL.
-5. **Playback**: `main.py` launches `mpv` with the m3u8 URL and a `--http-header-fields=Referer: ...` argument, because the video host rejects requests without the right Referer.
+Slow steps (search, posters, episodes, resolving the stream) run through `workers.py`, which runs them on a background thread pool and reports back to the window.
 
 ### Project layout
 
 ```
 QAnime/
-├── main.py            # Qt window: search box, anime list, episode list, launches mpv
-├── anime_scrape.py    # All scraping/decoding logic
-├── config.py          # Base URL, API endpoint templates, User-Agent
-├── requirements.txt   # Python dependencies
-├── pyproject.toml     # PySide6 project file
-├── resources.qrc      # Qt resource definition (killua.jpg)
-├── resources_rc.py    # Compiled Qt resources (generated by pyside6-rcc)
-└── killua.jpg         # Image bundled as a Qt resource
+├── qanime/
+│   ├── __main__.py        # entry point: python -m qanime
+│   ├── anime_scrape.py    # all scraping and decoding logic
+│   ├── config.py          # base URL, endpoints, User-Agent
+│   └── qt_ui/
+│       ├── main.py        # main window: results, episodes, mpv launch
+│       ├── landing.py     # start page with the search box
+│       ├── workers.py     # background threads for network calls
+│       └── style.qss      # theme
+├── resources/             # background image
+├── docs/screenshots/      # images used in this README
+└── requirements.txt
 ```
 
 ### Configuration
 
-All endpoints and the User-Agent live in `config.py`:
+Endpoints and the User-Agent live in `qanime/config.py`:
 
 ```python
 BASE_API     = "https://hianime.at"
 SEARCH_API   = f"{BASE_API}/search?keyword=%s"
 EPISODES_API = f"{BASE_API}/api/theme/episode/list/%s"
 SERVERS_API  = f"{BASE_API}/api/theme/episode/servers?episodeId=%s"
-AGENT        = "Mozilla/5.0 ..."
 ```
 
-Scrapers depend on a site's exact markup and API shape. **If the site changes its domain, HTML, or encryption, QAnime will break** until the selectors, endpoints, or decoding key are updated. A changed domain only needs `BASE_API` edited.
+Scrapers depend on a site's exact markup and API. **If the site changes its domain, HTML or encryption, QAnime breaks** until the selectors, endpoints or decoding key are updated. A changed domain only needs `BASE_API` edited.
 
 ---
 
@@ -128,8 +121,8 @@ Scrapers depend on a site's exact markup and API shape. **If the site changes it
 
 | Problem | Likely cause / fix |
 |---|---|
-| `FileNotFoundError: 'mpv'` when double-clicking an episode | mpv isn't installed or isn't on `PATH` |
-| `ModuleNotFoundError: requests` / `bs4` | Run `pip install requests beautifulsoup4` |
+| `mpv not found on PATH` in the status bar | mpv isn't installed or isn't on `PATH` |
+| `ModuleNotFoundError` | Run `pip install -r requirements.txt` inside your virtual environment |
 | Search returns nothing | Site is down, blocked in your region, or the domain in `config.py` changed |
 | `No stream found` / `No m3u8 link` | The server/embed format changed, or that episode has no `sub` stream |
 | Video opens but won't play | The Referer or stream host changed; check the embed URL logic |
