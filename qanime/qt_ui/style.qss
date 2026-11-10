@@ -1,0 +1,60 @@
+/* Palette: ink #131415, panel #1a1b1d, line #2b2d30, text #e7e4dd,
+   muted #8c8e92, accent amber #d9a441 */
+* {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    color: #e7e4dd;
+}
+QMainWindow, QWidget#root { background: #131415; }
+QLabel { background: transparent; }
+QLabel#heading {
+    font-family: "Iowan Old Style", Georgia, "Times New Roman", serif;
+    font-size: 24px; font-weight: 600;
+}
+QLabel#meta { color: #8c8e92; line-height: 150%; }
+QLabel#poster { background: #1a1b1d; border-radius: 3px; }
+QLineEdit {
+    background: #1a1b1d; border: 1px solid #2b2d30; border-radius: 4px;
+    padding: 8px 12px; font-size: 14px; selection-background-color: #d9a441;
+    selection-color: #131415;
+}
+QLineEdit:focus { border: 1px solid #d9a441; }
+QPushButton {
+    background: #d9a441; border: none; border-radius: 4px;
+    padding: 9px 18px; font-weight: 600; color: #131415;
+}
+QPushButton:hover { background: #e6b559; }
+QPushButton:disabled { background: #232528; color: #66686c; }
+QListWidget {
+    background: transparent; border: none; border-top: 1px solid #2b2d30;
+    padding: 6px 0; outline: none;
+}
+QListWidget::item { border-radius: 3px; padding: 8px; }
+QListWidget::item:hover { background: #1c1e20; }
+QListWidget::item:selected { background: #232528; color: #d9a441; }
+QSplitter::handle { background: transparent; width: 8px; }
+QStatusBar { background: #131415; color: #8c8e92; border-top: 1px solid #222426; }
+QScrollBar:vertical { background: transparent; width: 10px; margin: 2px; }
+QScrollBar::handle:vertical { background: #2b2d30; border-radius: 3px; min-height: 30px; }
+QScrollBar::handle:vertical:hover { background: #404347; }
+QScrollBar::add-line, QScrollBar::sub-line { height: 0; }
+QScrollBar:horizontal { height: 0; }
+
+/* Landing page */
+QLabel#logo {
+    font-family: "Iowan Old Style", Georgia, "Times New Roman", serif;
+    font-size: 56px; font-weight: 500; letter-spacing: -1px;
+}
+QLineEdit#heroSearch {
+    background: transparent; border: none; border-bottom: 1px solid #55585d;
+    border-radius: 0; padding: 10px 2px; font-size: 18px; min-height: 24px;
+}
+QLineEdit#heroSearch:focus { border-bottom: 1px solid #d9a441; }
+QLineEdit#heroSearch:disabled { color: #66686c; }
+
+/* Navigation */
+QPushButton#backBtn {
+    background: transparent; color: #8c8e92; border: none;
+    padding: 4px 0; font-weight: 400; text-align: left;
+}
+QPushButton#backBtn:hover { background: transparent; color: #e7e4dd; }
