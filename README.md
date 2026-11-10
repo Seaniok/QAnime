@@ -152,4 +152,4 @@ Scrapers depend on a site's exact markup and API. **If the site changes its doma
 
 ## License
 
-No license file is included yet. Until one is added, all rights are reserved by the author by default. Since this project is inspired by ani-cli (GPL-3.0), consider picking a license that is compatible with it if you reused any of its logic.
+Released under the MIT License. See [LICENSE](LICENSE).
