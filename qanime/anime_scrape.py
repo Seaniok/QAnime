@@ -22,26 +22,33 @@ def hianime_search(anime: str):
     anime_list = []
     
     try:
-        count = 0
         r = requests.get(search_page, headers=headers, timeout=10)
         content = BeautifulSoup(r.text, "html.parser")
-        for anime_item in content.find_all("h3", class_="film-name"):
-            count += 1
-            if count == 10:
-                break
+        for anime_item in content.find_all("h3", class_="film-name")[:10]:
             anime_title = anime_item.find("a")["title"]
             anime_link = anime_item.find("a")["href"]
             anime_id = anime_link.split("-")[-1]
+            card = anime_item.find_parent(class_="flw-item")
+            img = card.find("img") if card else None
+            desc = card.find(class_="description") if card else None
             anime_list.append({
                 "title": anime_title,
                 "link": anime_link,
                 "id": anime_id,
+                "poster": (img.get("data-src") or img.get("src")) if img else None,
+                "description": desc.get_text(strip=True) if desc else "",
             })
-        
+
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         print("Connection Error or Connection Timeout")
     
     return anime_list
+
+"""Download poster image bytes"""
+def hianime_poster(url: str) -> bytes:
+    r = requests.get(url, headers={"User-Agent": c.AGENT}, timeout=10)
+    r.raise_for_status()
+    return r.content
 
 """Get the episodes list of the selected anime"""
 def hianime_episodes(anime_id: int):
