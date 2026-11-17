@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QListWidget, QListWidgetItem, QLabel, QPushButton,
-    QStackedWidget, QGraphicsOpacityEffect,
+    QStackedWidget, QGraphicsOpacityEffect, QButtonGroup,
 )
 
 from qanime import anime_scrape
@@ -100,9 +100,22 @@ class MainWindow(QMainWindow):
         self.episode_list = QListWidget()
         self.episode_list.itemDoubleClicked.connect(self.play)
         rl.addWidget(self.episode_list, 1)
+        controls = QHBoxLayout()
+        controls.setSpacing(0)
+        self.audio_group = QButtonGroup(self)
+        for i, (label, kind) in enumerate((("Sub", "sub"), ("Dub", "dub"))):
+            btn = QPushButton(label, objectName="segLeft" if i == 0 else "segRight")
+            btn.setCheckable(True)
+            btn.setChecked(kind == "sub")
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn.setProperty("kind", kind)
+            self.audio_group.addButton(btn)
+            controls.addWidget(btn)
+        controls.addSpacing(12)
         self.play_btn = QPushButton("Play episode")
         self.play_btn.clicked.connect(self.play_selected)
-        rl.addWidget(self.play_btn)
+        controls.addWidget(self.play_btn, 1)
+        rl.addLayout(controls)
 
         self.statusBar().showMessage("Ready")
 
@@ -213,14 +226,15 @@ class MainWindow(QMainWindow):
     def play(self, item):
         ep = self.episodes[self.episode_list.row(item)]
         self.play_btn.setEnabled(False)
-        self._run(self._resolve, ep["id"], on_done=self._play_ready,
-                  busy=f"Resolving stream for episode {ep['number']}…")
+        kind = self.audio_group.checkedButton().property("kind")
+        self._run(self._resolve, ep["id"], kind, on_done=self._play_ready,
+                  busy=f"Resolving {kind} stream for episode {ep['number']}…")
 
     @staticmethod
-    def _resolve(ep_id):
-        info = anime_scrape.hianime_download_m3u8(ep_id, "sub")
+    def _resolve(ep_id, kind="sub"):
+        info = anime_scrape.hianime_download_m3u8(ep_id, kind)
         if not info.get("embed_url"):
-            return None, "No stream found"
+            return None, f"No {kind} stream for this episode"
         info = anime_scrape.extract_video_data(info)
         if not info.get("m3u8_url"):
             return None, "No m3u8 link"
@@ -234,11 +248,12 @@ class MainWindow(QMainWindow):
             return
         p = urlparse(info["embed_url"])
         try:
-            subprocess.Popen([
-                "mpv",
-                f"--http-header-fields=Referer: {p.scheme}://{p.netloc}/",
-                info["m3u8_url"],
-            ])
+            args = ["mpv", f"--http-header-fields=Referer: {p.scheme}://{p.netloc}/"]
+            args += [f"--sub-file={s}" for s in info.get("subs", [])]
+            if info.get("type") == "dub":
+                args.append("--sid=no")  # subs loaded but hidden; toggle with 'j'
+            args.append(info["m3u8_url"])
+            subprocess.Popen(args)
             self.statusBar().showMessage("Playing in mpv", 5000)
         except FileNotFoundError:
             self.statusBar().showMessage("mpv not found on PATH", 8000)
