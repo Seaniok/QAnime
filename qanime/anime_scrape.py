@@ -102,7 +102,7 @@ def hianime_download_m3u8(episode_id: int, desired_type: str):
                     "name": server_name,
                     "embed_url": decoded_hash
                 }
-            break
+                break
         
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         print("Ups !")
@@ -150,6 +150,9 @@ def extract_video_data(server_info: dict):
     try:
         decrypted_json = deobfuscate_blob(encrypted_blob)
         server_info["m3u8_url"] = decrypted_json.get("src")
+        # default track first so mpv selects it
+        subs = sorted(decrypted_json.get("subtitles") or [], key=lambda t: not t.get("default"))
+        server_info["subs"] = [t["src"] for t in subs if t.get("src")]
     except Exception as e:
         print(f"Błąd podczas dekodowania bloba: {e}")
         
