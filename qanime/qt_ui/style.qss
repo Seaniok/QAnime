@@ -58,3 +58,15 @@ QPushButton#backBtn {
     padding: 4px 0; font-weight: 400; text-align: left;
 }
 QPushButton#backBtn:hover { background: transparent; color: #e7e4dd; }
+
+/* Sub / Dub segmented toggle */
+QPushButton#segLeft, QPushButton#segRight {
+    background: #1a1b1d; color: #8c8e92; border: 1px solid #2b2d30;
+    padding: 9px 16px; font-weight: 600;
+}
+QPushButton#segLeft { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+QPushButton#segRight { border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+QPushButton#segLeft:hover, QPushButton#segRight:hover { color: #e7e4dd; }
+QPushButton#segLeft:checked, QPushButton#segRight:checked {
+    background: #232528; color: #d9a441; border-color: #d9a441;
+}
