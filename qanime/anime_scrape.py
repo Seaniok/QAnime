@@ -1,11 +1,14 @@
-import requests
-from qanime import config as c
-import json
-from bs4 import BeautifulSoup
 import base64
+import json
 import re
-from urllib.parse import urlparse
 from itertools import cycle
+from urllib.parse import urlparse
+
+import requests
+from bs4 import BeautifulSoup
+
+from qanime import config as c
+
 
 def hianime_request():
     headers = {"User-Agent": c.AGENT}
@@ -153,7 +156,7 @@ def extract_video_data(server_info: dict):
         # default track first so mpv selects it
         subs = sorted(decrypted_json.get("subtitles") or [], key=lambda t: not t.get("default"))
         server_info["subs"] = [t["src"] for t in subs if t.get("src")]
-    except Exception as e:
+    except (ValueError, AttributeError) as e:
         print(f"Błąd podczas dekodowania bloba: {e}")
         
     return server_info

@@ -1,9 +1,20 @@
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QPoint, QTimer, Signal, QPropertyAnimation, QEasingCurve, QParallelAnimationGroup
-from PySide6.QtGui import QPainter, QPixmap, QLinearGradient, QColor, QIcon
+from PySide6.QtCore import (
+    QEasingCurve,
+    QParallelAnimationGroup,
+    QPropertyAnimation,
+    Qt,
+    QTimer,
+    Signal,
+)
+from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPixmap
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QLineEdit, QGraphicsOpacityEffect,
+    QGraphicsOpacityEffect,
+    QLabel,
+    QLineEdit,
+    QVBoxLayout,
+    QWidget,
 )
 
 BG = Path(__file__).resolve().parents[2] / "resources" / "killua.jpg"

@@ -1,19 +1,28 @@
-import sys
 import subprocess
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
-from PySide6.QtCore import Qt, QSize, QPropertyAnimation, QEasingCurve
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSize, Qt
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QListWidget, QListWidgetItem, QLabel, QPushButton,
-    QStackedWidget, QGraphicsOpacityEffect, QButtonGroup,
+    QApplication,
+    QButtonGroup,
+    QGraphicsOpacityEffect,
+    QHBoxLayout,
+    QLabel,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
 )
 
 from qanime import anime_scrape
-from qanime.qt_ui.workers import run_async
 from qanime.qt_ui.landing import LandingPage
+from qanime.qt_ui.workers import run_async
 
 THUMB = QSize(140, 200)
 
