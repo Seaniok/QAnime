@@ -1,2 +1,6 @@
 [project]
 name = "QAnime"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
